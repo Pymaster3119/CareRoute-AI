@@ -32,12 +32,17 @@ def create_doctor_table():
 
 def add_user(username, email, password):
     with get_connection() as conn:
+        if conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone():
+            return False 
         conn.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", (username, email, password))
+        return True
 
 def add_doctor(name, password, specialty, email, workplace, degree):
     with get_connection() as conn:
-        conn.execute("INSERT INTO doctors (name, password, specialty, email, workplace, degree) VALUES (?, ?, ?, ?, ?, ?)",
-                     (name, password, specialty, email, workplace, degree))
+        if conn.execute("SELECT * FROM doctors WHERE name = ?", (name,)).fetchone():
+            return False
+        conn.execute("INSERT INTO doctors (name, password, specialty, email, workplace, degree) VALUES (?, ?, ?, ?, ?, ?)", (name, password, specialty, email, workplace, degree))
+        return True
 
 #endregion
 #region Verify user/doctors
