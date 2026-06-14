@@ -1,16 +1,24 @@
+import os
 import sqlite3
-conn = sqlite3.connect('user_data.db')
-c = conn.cursor()
 
+DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'user_data.db')
+
+
+def get_connection():
+    return sqlite3.connect(DATABASE_PATH)
+
+#region Create tables
 def create_user_table():
-    c.execute(   '''CREATE TABLE IF NOT EXISTS users
+    with get_connection() as conn:
+        conn.execute('''CREATE TABLE IF NOT EXISTS users
                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT NOT NULL,
-                    email TEXT NOT NULL)''')
-    conn.commit()
+                    email TEXT NOT NULL,
+                    password TEXT NOT NULL)''')
 
 def create_doctor_table():
-    c.execute(   '''CREATE TABLE IF NOT EXISTS doctors
+    with get_connection() as conn:
+        conn.execute('''CREATE TABLE IF NOT EXISTS doctors
                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
                     password TEXT NOT NULL,
@@ -18,18 +26,33 @@ def create_doctor_table():
                     email TEXT NOT NULL,
                     workplace TEXT NOT NULL,
                     degree TEXT NOT NULL)''')
-    conn.commit()
 
-def add_user(username, email):
-    c.execute("INSERT INTO users (username, email) VALUES (?, ?)", (username, email))
-    conn.commit()
+#endregion
+#region Add users/doctors
+
+def add_user(username, email, password):
+    with get_connection() as conn:
+        conn.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", (username, email, password))
 
 def add_doctor(name, password, specialty, email, workplace, degree):
-    c.execute("INSERT INTO doctors (name, password, specialty, email, workplace, degree) VALUES (?, ?, ?, ?, ?, ?)",
-              (name, password, specialty, email, workplace, degree))
-    conn.commit()
+    with get_connection() as conn:
+        conn.execute("INSERT INTO doctors (name, password, specialty, email, workplace, degree) VALUES (?, ?, ?, ?, ?, ?)",
+                     (name, password, specialty, email, workplace, degree))
 
+#endregion
+#region Verify user/doctors
 
-if __name__ == "__main__":
-    create_user_table()
-    create_doctor_table()
+def verify_user(username, password):
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
+        return cursor.fetchone() is not None
+    
+def verify_doctor(name, password):
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT * FROM doctors WHERE name = ? AND password = ?", (name, password))
+        return cursor.fetchone() is not None
+
+#endregion
+
+create_user_table()
+create_doctor_table()
