@@ -3,9 +3,9 @@ import DataStorage.datastorage
 
 app = Flask(__name__)
 
-@app.route('/addUser/<username>/<email>/<password>')
-def add_user(username, email, password):
-    result = DataStorage.datastorage.add_user(username, email, password)
+@app.route('/addUser/<username>/<email>/<password>/<location>')
+def add_user(username, email, password, location):
+    result = DataStorage.datastorage.add_user(username, email, password, location)
     if not result:
         return f"User {username} already exists!"
     return f"User {username} added successfully!"

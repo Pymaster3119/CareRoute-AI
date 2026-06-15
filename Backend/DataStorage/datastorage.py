@@ -14,7 +14,8 @@ def create_user_table():
                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT NOT NULL,
                     email TEXT NOT NULL,
-                    password TEXT NOT NULL)''')
+                    password TEXT NOT NULL,
+                    location TEXT NOT NULL)''')
 
 def create_doctor_table():
     with get_connection() as conn:
@@ -30,11 +31,11 @@ def create_doctor_table():
 #endregion
 #region Add users/doctors
 
-def add_user(username, email, password):
+def add_user(username, email, password, location):
     with get_connection() as conn:
         if conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone():
             return False 
-        conn.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", (username, email, password))
+        conn.execute("INSERT INTO users (username, email, password, location) VALUES (?, ?, ?, ?)", (username, email, password, location))
         return True
 
 def add_doctor(name, password, specialty, email, workplace, degree):
