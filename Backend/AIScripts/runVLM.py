@@ -11,7 +11,7 @@ def _load_model_and_processor():
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         "Qwen/Qwen2.5-VL-3B-Instruct",
         torch_dtype="auto",
-        device_map="auto",
+        device_map="mps",
     )
     processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
     return model, processor, Image, torch
@@ -64,7 +64,7 @@ def run_vlm(system_promt, user_prompt, image_dir):
     if hasattr(model, "device"):
         inputs = inputs.to(model.device)
     else:
-        inputs = {key: value.to("cuda" if torch.cuda.is_available() else "cpu") for key, value in inputs.items()}
+        inputs = {key: value.to("cuda" if torch.cuda.is_available() else "mps") for key, value in inputs.items()}
 
     with torch.inference_mode():
         generated_ids = model.generate(
@@ -79,4 +79,5 @@ def run_vlm(system_promt, user_prompt, image_dir):
         skip_special_tokens=True,
         clean_up_tokenization_spaces=False,
     )[0]
+    print(response)
     return response.strip()
