@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 import DataStorage.datastorage
 import usersignon
 from werkzeug.utils import secure_filename
+import documentparsing
 
 app = Flask(__name__)
 
@@ -66,6 +67,36 @@ def verify_doctor():
         return f"Doctor {name} verified successfully!"
     else:
         return f"Doctor {name} verification failed!"
+    
+@app.route('/uploadDocument', methods=['POST'])
+def upload_document():
+    #Parse form
+    user = request.form['username']
+    password = request.form['password']
+    caption = request.form['caption']
+
+    #Save document
+    try:
+        document = request.files.get('document')
+    except:
+        return jsonify({"message": "Document is required!"}), 400
+    if not document:
+        return jsonify({"message": "Document is required!"}), 400
+    document_path = secure_filename(document.filename)
+    document_path = os.path.join(os.path.join(os.path.dirname(__file__), 'temp'), document_path)
+    document.save(document_path)
+
+    #Authenticate
+    if not DataStorage.datastorage.verify_user(user, password):
+        os.remove(document_path)
+        return jsonify({"message": f"User {user} verification failed!"}), 401
+    
+    #Parse document
+    result = documentparsing.parse_document(document_path, caption)
+
+    #Delete temp file & return
+    os.remove(document_path)
+    return jsonify(result), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
