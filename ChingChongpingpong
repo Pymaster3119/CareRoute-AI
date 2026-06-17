@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CareRoute AI</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#f5f8fc;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 40px;
+    background:white;
+    border-bottom:1px solid #ddd;
+}
+
+.logo{
+    font-size:20px;
+    font-weight:bold;
+    color:#2563eb;
+}
+
+nav{
+    display:flex;
+    gap:25px;
+    align-items:center;
+}
+
+nav a{
+    text-decoration:none;
+    color:#333;
+    font-size:15px;
+}
+
+.get-started{
+    background:#2563eb;
+    color:white;
+    padding:10px 18px;
+    border-radius:8px;
+}
+
+.hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    max-width:1200px;
+    margin:auto;
+    padding:70px 40px;
+}
+
+.hero-left{
+    width:55%;
+}
+
+.hero-left h1{
+    font-size:36px;
+    line-height:1.3;
+    margin-bottom:20px;
+}
+
+.blue{
+    color:#2563eb;
+}
+
+.hero-left p{
+    font-size:18px;
+    color:#666;
+    line-height:1.6;
+    margin-bottom:25px;
+}
+
+.buttons{
+    display:flex;
+    gap:15px;
+}
+
+.primary-btn{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.secondary-btn{
+    background:white;
+    border:1px solid #ccc;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* IMAGE PLACEHOLDER */
+
+.hero-right{
+    width:40%;
+    display:flex;
+    justify-content:center;
+}
+
+.illustration{
+    width:280px;
+    height:280px;
+    background:white;
+    border-radius:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:100px;
+}
+
+
+.features{
+    max-width:1200px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+    padding:0 40px 40px;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.card h3{
+    margin-bottom:10px;
+}
+
+.card p{
+    color:#666;
+    line-height:1.6;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+CareRoute AI
+</div>
+
+<nav>
+<a href="#">How It Works</a>
+<a href="#">About</a>
+<a href="#">For Experts</a>
+<a href="#">Contact</a>
+<a href="#" class="get-started">Get Started</a>
+</nav>
+
+</header>
+
+<section class="hero">
+
+<div class="hero-left">
+
+<h1>
+Understand Your Medical Papers.<br>
+Take the <span class="blue">Right Next Steps.</span>
+</h1>
+
+<p>
+Upload your discharge papers or medical reports.
+We summarize them in plain language and help
+connect you with the right specialists.
+</p>
+
+<div class="buttons">
+<button class="primary-btn">Upload Document</button>
+<button class="secondary-btn">Try Demo</button>
+</div>
+
+</div>
+
+<div class="hero-right">
+<div class="illustration">
+👩‍⚕️
+</div>
+</div>
+
+</section>
+
+<section class="features">
+
+<div class="card">
+<h3>📝 Plain Language</h3>
+<p>
+Medical reports translated into easy-to-read summaries.
+</p>
+</div>
+
+<div class="card">
+<h3>✅ Actionable Checklists</h3>
+<p>
+Know what steps to take after reading your report.
+</p>
+</div>
+
+<div class="card">
+<h3>👨‍⚕️ Find Specialists</h3>
+<p>
+Get connected with doctors who fit your needs.
+</p>
+</div>
+
+</section>
+
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Document</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f5f8fc;
+}
+
+header{
+    background:white;
+    padding:15px 40px;
+    border-bottom:1px solid #ddd;
+}
+
+.logo{
+    color:#2563eb;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.container{
+    max-width:900px;
+    margin:60px auto;
+}
+
+.card{
+    background:white;
+    border-radius:15px;
+    padding:40px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+h1{
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#666;
+    margin-bottom:30px;
+}
+
+.upload-box{
+    border:3px dashed #2563eb;
+    border-radius:15px;
+    padding:60px;
+    text-align:center;
+    background:#f8fbff;
+}
+
+.upload-icon{
+    font-size:60px;
+    margin-bottom:15px;
+}
+
+.upload-btn{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+.info{
+    margin-top:25px;
+    color:#666;
+}
+
+.next-btn{
+    margin-top:30px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:14px 25px;
+    border-radius:8px;
+    cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">CareRoute AI</div>
+</header>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>Upload Medical Document</h1>
+
+        <p class="subtitle">
+            Upload discharge papers, lab results, referrals,
+            or other medical documents.
+        </p>
+
+        <div class="upload-box">
+
+            <div class="upload-icon">📄</div>
+
+            <h2>Drag & Drop Files Here</h2>
+
+            <p>or click below to browse</p>
+
+            <button class="upload-btn">
+                Choose File
+            </button>
+
+        </div>
+
+        <p class="info">
+            Supported formats: PDF, JPG, PNG
+        </p>
+
+        <button class="next-btn">
+            Continue
+        </button>
+
+    </div>
+
+</div>
+
+</body>
+</html>
+
+
+
+
