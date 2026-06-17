@@ -25,7 +25,8 @@ def create_doctor_table():
                     specialty TEXT NOT NULL,
                     email TEXT NOT NULL,
                     workplace TEXT NOT NULL,
-                    degree TEXT NOT NULL)''')
+                    degree TEXT NOT NULL,
+                    summary TEXT NOT NULL)''')
 
 #endregion
 #region Add users/doctors
@@ -37,11 +38,11 @@ def add_user(username, email, password, location):
         conn.execute("INSERT INTO users (username, email, password, location) VALUES (?, ?, ?, ?)", (username, email, password, location))
         return True
 
-def add_doctor(name, password, specialty, email, workplace, degree):
+def add_doctor(name, password, specialty, email, workplace, degree, summary):
     with get_connection() as conn:
         if conn.execute("SELECT * FROM doctors WHERE name = ?", (name,)).fetchone():
             return False
-        conn.execute("INSERT INTO doctors (name, password, specialty, email, workplace, degree) VALUES (?, ?, ?, ?, ?, ?)", (name, password, specialty, email, workplace, degree))
+        conn.execute("INSERT INTO doctors (name, password, specialty, email, workplace, degree, summary) VALUES (?, ?, ?, ?, ?, ?, ?)", (name, password, specialty, email, workplace, degree, summary))
         return True
 
 #endregion

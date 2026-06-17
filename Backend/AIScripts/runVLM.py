@@ -79,5 +79,4 @@ def run_vlm(system_promt, user_prompt, image_dir):
         skip_special_tokens=True,
         clean_up_tokenization_spaces=False,
     )[0]
-    print(response)
     return response.strip()
