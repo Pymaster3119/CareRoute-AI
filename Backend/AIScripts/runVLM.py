@@ -7,14 +7,21 @@ from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
 
 @lru_cache(maxsize=1)
 def _load_model_and_processor():
-    
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         "Qwen/Qwen2.5-VL-3B-Instruct",
-        torch_dtype="auto",
         device_map="mps",
+        torch_dtype=torch.float16
     )
     processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
     return model, processor, Image, torch
+
+
+def _prepare_image(image_path):
+    image = Image.open(image_path).convert("RGB")
+    max_dimension = 1024
+    if max(image.size) > max_dimension:
+        image.thumbnail((max_dimension, max_dimension))
+    return image
 
 
 def _resolve_image_path(image_dir):
@@ -34,7 +41,7 @@ def run_vlm(system_promt, user_prompt, image_dir):
     model, processor, image_module, torch = _load_model_and_processor()
     image_path = _resolve_image_path(image_dir)
 
-    image = image_module.open(image_path).convert("RGB")
+    image = _prepare_image(image_path)
     messages = [
         {
             "role": "system",

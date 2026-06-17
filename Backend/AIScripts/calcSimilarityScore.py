@@ -5,20 +5,19 @@ import torch.nn.functional as F
 from transformers import AutoModel, AutoTokenizer
 
 
-MODEL_NAME = "zeroentropy/zembed-1-embedding"
+MODEL_NAME = "abhinand/MedEmbed-large-v0.1"
 
 
 @lru_cache(maxsize=1)
 def _load_model_and_tokenizer():
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    model = AutoModel.from_pretrained(MODEL_NAME)
-
+    model = AutoModel.from_pretrained(MODEL_NAME, torch_dtype=torch.float16)
     if torch.cuda.is_available():
         model = model.to("cuda")
     elif torch.backends.mps.is_available():
         model = model.to("mps")
     else:
-        model = model.to("cpu")
+        model = model.to("cpu").to(torch.float32)
 
     model.eval()
     return model, tokenizer
@@ -60,6 +59,7 @@ def _encode_text(text):
 
 
 def calculate_similarity_score(phrase1, phrase2):
+    print("similarity score called")
     if not phrase1 or not phrase2:
         return 0.0
 

@@ -26,8 +26,7 @@ def create_doctor_table():
                     email TEXT NOT NULL,
                     workplace TEXT NOT NULL,
                     degree TEXT NOT NULL,
-                    summary TEXT NOT NULL,
-                    assignedDocuments TEXT NOT NULL)''')
+                    summary TEXT NOT NULL)''')
         
 def create_document_table():
     with get_connection() as conn:

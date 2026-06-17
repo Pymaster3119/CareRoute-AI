@@ -11,6 +11,7 @@ def parse_document(document_dir, caption):
     for i in range(DataStorage.datastorage.get_num_doctors()):
         doctor = DataStorage.datastorage.get_doctor_by_id(i + 1)
         similarity_score = AIScripts.calcSimilarityScore.calculate_similarity_score(phrase, doctor[7])
+        print(similarity_score)
         best_matches.append((doctor, similarity_score))
 
     best_matches.sort(key=lambda x: x[1], reverse=True)
