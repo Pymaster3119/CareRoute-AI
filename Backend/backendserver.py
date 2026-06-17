@@ -83,7 +83,7 @@ def upload_document():
     if not document:
         return jsonify({"message": "Document is required!"}), 400
     document_path = secure_filename(document.filename)
-    document_path = os.path.join(os.path.join(os.path.dirname(__file__), 'temp'), document_path)
+    document_path = os.path.join(os.path.join(os.path.dirname(__file__), 'documents'), document_path)
     document.save(document_path)
 
     #Authenticate
@@ -94,8 +94,6 @@ def upload_document():
     #Parse document
     result = documentparsing.parse_document(document_path, caption)
 
-    #Delete temp file & return
-    os.remove(document_path)
     return jsonify(result), 200
 
 if __name__ == '__main__':

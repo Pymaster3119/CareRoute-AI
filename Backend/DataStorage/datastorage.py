@@ -75,7 +75,21 @@ def verify_doctor(name, password):
         return cursor.fetchone() is not None
 
 #endregion
+#region loop through doctors
+
+def get_num_doctors():
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT COUNT(*) FROM doctors")
+        return cursor.fetchone()[0]
+
+def get_doctor_by_id(doctor_id):
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT * FROM doctors WHERE id = ?", (doctor_id,))
+        return cursor.fetchone()
+
+#endregion
 #region add documents
+
 def add_document(document_path, summary, matched_doctors, user_id):
     with get_connection() as conn:
         columns = "document_path, summary, user_id"
