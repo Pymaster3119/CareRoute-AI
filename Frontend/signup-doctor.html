@@ -91,6 +91,7 @@
   </div>
 </div>
 
+<script src="auth-state.js"></script>
 <script>
   const degreeInput = document.getElementById('degree');
   const degreeFileName = document.getElementById('degreeFileName');
@@ -130,6 +131,7 @@
       }
 
       if (response.ok) {
+        CareRouteAuth.setAuthState('doctor', document.getElementById('docName').value, document.getElementById('docPassword').value);
         window.location.href = 'doctor-dashboard.html';
         return;
       }

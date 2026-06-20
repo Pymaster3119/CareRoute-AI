@@ -19,7 +19,7 @@
   </div>
   <div class="topbar-right">
     <div class="icon-btn">🔔</div>
-    <div class="avatar">EM</div>
+    <div class="avatar" id="signedInAvatar">EM</div>
   </div>
 </header>
 
@@ -81,7 +81,21 @@
   </main>
 </div>
 
+<script src="auth-state.js"></script>
 <script>
+  function updateSignedInUser() {
+    const username = CareRouteAuth.getSignedInUsername();
+    const avatar = document.getElementById('signedInAvatar');
+    if (!username || !avatar) {
+      return;
+    }
+
+    avatar.textContent = username;
+    avatar.title = username;
+  }
+
+  updateSignedInUser();
+
   const fileInput = document.getElementById('document');
   const fileName = document.getElementById('fileName');
   fileInput.addEventListener('change', () => {

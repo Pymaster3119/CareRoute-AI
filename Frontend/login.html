@@ -64,6 +64,7 @@
   </div>
 </div>
 
+<script src="auth-state.js"></script>
 <script>
   const loginStatus = document.getElementById('loginStatus');
 
@@ -118,6 +119,7 @@
       const responseText = await response.text();
 
       if (response.ok && responseIndicatesSuccess(responseText)) {
+        CareRouteAuth.setAuthState('patient', username, password);
         window.location.href = 'dashboard.html';
         return;
       }
@@ -144,6 +146,7 @@
       const responseText = await response.text();
 
       if (response.ok && responseIndicatesSuccess(responseText)) {
+        CareRouteAuth.setAuthState('doctor', name, password);
         window.location.href = 'doctor-dashboard.html';
         return;
       }
