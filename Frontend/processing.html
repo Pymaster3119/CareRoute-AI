@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyzing Your Document — CareRoute AI</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="dashboard.html" class="logo">💙 CareRoute AI</a>
+  <div class="topbar-steps">
+    <span class="step done">✓ Upload</span>
+    <span class="sep">—</span>
+    <span class="step active">② Analyze</span>
+    <span class="sep">—</span>
+    <span class="step">③ Results</span>
+  </div>
+  <div class="topbar-right">
+    <div class="icon-btn">🔔</div>
+    <div class="avatar">EM</div>
+  </div>
+</header>
+
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="dashboard.html">🏠 Home</a>
+    <a href="upload.html">📤 Upload</a>
+    <a href="history.html">🕘 History</a>
+    <a href="my-questions.html">❓ My Questions</a>
+    <a href="resources.html">📚 Resources</a>
+    <div class="sidebar-divider"></div>
+    <a href="profile.html">👤 Profile</a>
+    <a href="settings.html">⚙️ Settings</a>
+    <a href="index.html" class="logout">↩ Log Out</a>
+  </aside>
+
+  <main class="main-content">
+    <h1 class="page-title">Analyzing Your Document...</h1>
+    <p class="page-subtitle">This may take a few moments.</p>
+
+    <div class="card">
+      <div style="text-align:center; font-size:60px; margin-bottom:10px;">📄 → 🤖 → ✅</div>
+
+      <div id="checklist">
+        <div class="checklist-item done"><span class="icon">✓</span><span class="label">Reading document</span></div>
+        <div class="checklist-item done"><span class="icon">✓</span><span class="label">Extracting key information</span></div>
+        <div class="checklist-item active"><span class="icon"></span><span class="label">Identifying important actions</span></div>
+        <div class="checklist-item"><span class="icon"></span><span class="label">Finding relevant specialists</span></div>
+        <div class="checklist-item"><span class="icon"></span><span class="label">Preparing your summary</span></div>
+      </div>
+
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:65%;"></div></div>
+      <p class="small muted" id="progressLabel" style="text-align:right;">65%</p>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Demo-only animation: walks the checklist forward, then redirects to the results dashboard.
+  // Replace this with real polling against your backend's processing status once it exists.
+  const items = document.querySelectorAll('.checklist-item');
+  const fill = document.getElementById('progressFill');
+  const label = document.getElementById('progressLabel');
+  let step = 2; // first two already marked done above
+
+  const interval = setInterval(() => {
+    if (step < items.length) {
+      items[step].classList.add('done');
+      items[step].classList.remove('active');
+      if (items[step + 1]) items[step + 1].classList.add('active');
+      step++;
+      const pct = Math.round((step / items.length) * 100);
+      fill.style.width = pct + '%';
+      label.textContent = pct + '%';
+    } else {
+      clearInterval(interval);
+      window.location.href = 'dashboard.html';
+    }
+  }, 900);
+</script>
+
+</body>
+</html>

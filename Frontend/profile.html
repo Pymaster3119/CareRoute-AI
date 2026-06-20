@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — CareRoute AI</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="dashboard.html" class="logo">💙 CareRoute AI</a>
+  <div class="topbar-right">
+    <div class="icon-btn">🔔</div>
+    <div class="avatar">EM</div>
+  </div>
+</header>
+
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="dashboard.html">🏠 Home</a>
+    <a href="upload.html">📤 Upload</a>
+    <a href="history.html">🕘 History</a>
+    <a href="my-questions.html">❓ My Questions</a>
+    <a href="resources.html">📚 Resources</a>
+    <div class="sidebar-divider"></div>
+    <a href="profile.html" class="active">👤 Profile</a>
+    <a href="settings.html">⚙️ Settings</a>
+    <a href="index.html" class="logout">↩ Log Out</a>
+  </aside>
+
+  <main class="main-content">
+    <h1 class="page-title">Your Profile</h1>
+    <p class="page-subtitle">Manage your account details.</p>
+
+    <div class="card" style="max-width:560px;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
+        <div class="avatar" style="width:64px; height:64px; font-size:22px;">EM</div>
+        <div>
+          <div style="font-weight:700; font-size:17px;">Emma Martinez</div>
+          <div class="muted small">Patient since March 2026</div>
+        </div>
+      </div>
+
+      <!-- Wire this up to a future "update profile" endpoint -->
+      <form action="profile.html" method="POST">
+        <div class="form-group">
+          <label for="profUsername">Username</label>
+          <input type="text" id="profUsername" name="username" value="emma_m">
+        </div>
+        <div class="form-group">
+          <label for="profEmail">Email address</label>
+          <input type="email" id="profEmail" name="email" value="emma.martinez@example.com">
+        </div>
+        <div class="form-group">
+          <label for="profLocation">Location</label>
+          <input type="text" id="profLocation" name="location" value="Camden, NJ">
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </form>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

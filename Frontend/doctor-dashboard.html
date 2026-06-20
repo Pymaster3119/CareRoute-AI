@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Dashboard — CareRoute AI</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="doctor-dashboard.html" class="logo">💙 CareRoute AI</a>
+  <div class="topbar-right">
+    <div class="icon-btn">🔔</div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div class="avatar">SL</div>
+      <div>
+        <div style="font-size:13.5px; font-weight:600;">Dr. Sarah Lee</div>
+        <div class="small muted">Pulmonologist</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="app-shell">
+
+  <!-- Doctor sidebar -->
+  <aside class="sidebar">
+    <a href="doctor-dashboard.html" class="active">📊 Dashboard</a>
+    <a href="doctor-dashboard.html?filter=queue" class="badge-link">📥 My Queue <span class="count">4</span></a>
+    <a href="doctor-dashboard.html?filter=answered">✅ Answered</a>
+    <a href="#">🧑‍🤝‍🧑 Patients</a>
+    <a href="resources.html">📚 Resources</a>
+    <div class="sidebar-divider"></div>
+    <a href="profile.html">👤 Profile</a>
+    <a href="settings.html">⚙️ Settings</a>
+    <a href="index.html" class="logout">↩ Log Out</a>
+  </aside>
+
+  <main class="main-content">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <h1 class="page-title" style="margin-bottom:0;">My Recommended Questions</h1>
+      <select style="width:auto;">
+        <option>Sort by: Highest Match</option>
+        <option>Sort by: Most Recent</option>
+      </select>
+    </div>
+    <p class="page-subtitle">Questions routed to you based on your expertise.</p>
+
+    <div class="card" style="padding:0; overflow:hidden;">
+
+      <a href="question-detail.html?id=1" style="text-decoration:none; color:inherit;">
+        <div class="list-row" style="padding:20px 24px;">
+          <div style="flex:1;">
+            <div class="title">"I was discharged from the ER with asthma. I'm not sure when to use my inhaler and what symptoms are serious."</div>
+            <div class="meta">From Document: Discharge_Summary.pdf &nbsp;•&nbsp; 10 min ago &nbsp;•&nbsp; Match: 94% &nbsp;•&nbsp; Asthma &middot; Discharge Summary</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <span class="badge badge-high">High Priority</span>
+            <span class="btn btn-primary btn-sm">View &amp; Answer</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="question-detail.html?id=2" style="text-decoration:none; color:inherit;">
+        <div class="list-row" style="padding:20px 24px;">
+          <div style="flex:1;">
+            <div class="title">"My child keeps having breathing problems and wheezing at night. The hospital said it might be asthma."</div>
+            <div class="meta">25 min ago &nbsp;•&nbsp; Match: 89% &nbsp;•&nbsp; Pediatric &middot; Asthma</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <span class="badge badge-high">High Priority</span>
+            <span class="btn btn-primary btn-sm">View &amp; Answer</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="question-detail.html?id=3" style="text-decoration:none; color:inherit;">
+        <div class="list-row" style="padding:20px 24px;">
+          <div style="flex:1;">
+            <div class="title">"Follow-up after asthma attack. Are there long-term treatments I should consider?"</div>
+            <div class="meta">1 hr ago &nbsp;•&nbsp; Match: 82% &nbsp;•&nbsp; Asthma &middot; Follow-up Care</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <span class="badge badge-medium">Medium Priority</span>
+            <span class="btn btn-primary btn-sm">View &amp; Answer</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="question-detail.html?id=4" style="text-decoration:none; color:inherit;">
+        <div class="list-row" style="padding:20px 24px;">
+          <div style="flex:1;">
+            <div class="title">"I have shortness of breath when exercising, is this related to my asthma?"</div>
+            <div class="meta">2 hr ago &nbsp;•&nbsp; Match: 75% &nbsp;•&nbsp; Asthma &middot; Exercise</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <span class="badge badge-medium">Medium Priority</span>
+            <span class="btn btn-primary btn-sm">View &amp; Answer</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="notice notice-info" style="margin-top:18px;">
+      🔒 <div>Questions are routed based on AI matching and your selected expertise. You are always in control of which questions you choose to answer.</div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

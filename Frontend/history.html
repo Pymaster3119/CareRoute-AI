@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>History — CareRoute AI</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="dashboard.html" class="logo">💙 CareRoute AI</a>
+  <div class="topbar-right">
+    <div class="icon-btn">🔔</div>
+    <div class="avatar">EM</div>
+  </div>
+</header>
+
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="dashboard.html">🏠 Home</a>
+    <a href="upload.html">📤 Upload</a>
+    <a href="history.html" class="active">🕘 History</a>
+    <a href="my-questions.html">❓ My Questions</a>
+    <a href="resources.html">📚 Resources</a>
+    <div class="sidebar-divider"></div>
+    <a href="profile.html">👤 Profile</a>
+    <a href="settings.html">⚙️ Settings</a>
+    <a href="index.html" class="logout">↩ Log Out</a>
+  </aside>
+
+  <main class="main-content">
+    <h1 class="page-title">Document History</h1>
+    <p class="page-subtitle">Every document you've uploaded and its summary.</p>
+
+    <div class="card">
+
+      <div class="list-row">
+        <div>
+          <div class="title">📄 Discharge_Summary.pdf</div>
+          <div class="meta">Uploaded May 20, 2026 &nbsp;•&nbsp; Asthma exacerbation</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span class="badge badge-success">Processed</span>
+          <a href="dashboard.html" class="btn btn-secondary btn-sm">View Summary</a>
+        </div>
+      </div>
+
+      <div class="list-row">
+        <div>
+          <div class="title">📄 Lab_Results_April.jpg</div>
+          <div class="meta">Uploaded April 3, 2026 &nbsp;•&nbsp; Bloodwork panel</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span class="badge badge-success">Processed</span>
+          <a href="dashboard.html" class="btn btn-secondary btn-sm">View Summary</a>
+        </div>
+      </div>
+
+      <div class="list-row">
+        <div>
+          <div class="title">📄 Referral_Letter.pdf</div>
+          <div class="meta">Uploaded March 18, 2026 &nbsp;•&nbsp; Orthopedic referral</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span class="badge badge-success">Processed</span>
+          <a href="dashboard.html" class="btn btn-secondary btn-sm">View Summary</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Empty state: shown instead of the list above when a patient has no documents yet -->
+    <!--
+    <div class="card">
+      <div class="empty-state">
+        <div class="icon">📄</div>
+        <h3>No documents yet</h3>
+        <p>Upload your first medical document to get started.</p>
+        <a href="upload.html" class="btn btn-primary" style="margin-top:14px;">Upload Document</a>
+      </div>
+    </div>
+    -->
+
+  </main>
+</div>
+
+</body>
+</html>

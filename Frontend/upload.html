@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Document — CareRoute AI</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="dashboard.html" class="logo">💙 CareRoute AI</a>
+  <div class="topbar-steps">
+    <span class="step active">① Upload</span>
+    <span class="sep">—</span>
+    <span class="step">② Analyze</span>
+    <span class="sep">—</span>
+    <span class="step">③ Results</span>
+  </div>
+  <div class="topbar-right">
+    <div class="icon-btn">🔔</div>
+    <div class="avatar">EM</div>
+  </div>
+</header>
+
+<div class="app-shell">
+
+  <!-- Patient sidebar -->
+  <aside class="sidebar">
+    <a href="dashboard.html">🏠 Home</a>
+    <a href="upload.html" class="active">📤 Upload</a>
+    <a href="history.html">🕘 History</a>
+    <a href="my-questions.html">❓ My Questions</a>
+    <a href="resources.html">📚 Resources</a>
+    <div class="sidebar-divider"></div>
+    <a href="profile.html">👤 Profile</a>
+    <a href="settings.html">⚙️ Settings</a>
+    <a href="index.html" class="logout">↩ Log Out</a>
+  </aside>
+
+  <main class="main-content">
+    <h1 class="page-title">Upload Your Medical Document</h1>
+    <p class="page-subtitle">We support PDFs, PNGs, and JPGs.</p>
+
+    <div class="card">
+
+      <!-- Wire this up to POST /uploadDocument (multipart/form-data)
+           fields: username, password, caption, document(file) -->
+      <form id="uploadForm" action="processing.html" method="GET" enctype="multipart/form-data">
+
+        <div class="upload-box" id="dropzone">
+          <div class="upload-icon">☁️</div>
+          <h3>Drag &amp; drop your file here</h3>
+          <p>or</p>
+          <input type="file" id="document" name="document" accept=".pdf,.png,.jpg,.jpeg" required style="display:none;">
+          <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('document').click()">Browse Files</button>
+          <div id="fileName"></div>
+        </div>
+        <p class="hint" style="text-align:center; margin-top:10px;">Accepted formats: PDF, PNG, JPG (Max size: 25MB)</p>
+
+        <div class="form-group" style="margin-top:24px;">
+          <label for="caption">Add a caption</label>
+          <textarea id="caption" name="caption" placeholder="e.g. Discharge summary from ER visit on May 20"></textarea>
+          <div class="hint">A short description helps the AI summarize your document more accurately.</div>
+        </div>
+
+        <div class="notice notice-warning">
+          ⚠️ <div>Please do not upload extremely sensitive documents with personal identifiers. Your privacy and security are our priority.</div>
+        </div>
+
+        <div style="text-align:center; margin:20px 0 8px;">— OR —</div>
+
+        <div class="card" style="background:var(--bg); box-shadow:none; text-align:center;">
+          <p style="margin-bottom:12px;">Try with an example. Use our sample discharge summary to see how it works.</p>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="window.location.href='processing.html?demo=1'">Use Example Document</button>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:24px;">Continue</button>
+      </form>
+    </div>
+  </main>
+</div>
+
+<script>
+  const fileInput = document.getElementById('document');
+  const fileName = document.getElementById('fileName');
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      fileName.innerHTML = `<div class="file-chip">📄 ${fileInput.files[0].name} <span class="remove" onclick="event.stopPropagation(); fileInput.value=''; fileName.innerHTML='';">✕</span></div>`;
+    }
+  });
+
+  // basic drag & drop visual support
+  const dropzone = document.getElementById('dropzone');
+  ['dragenter','dragover'].forEach(evt => dropzone.addEventListener(evt, e => {
+    e.preventDefault();
+    dropzone.style.background = '#dde9ff';
+  }));
+  ['dragleave','drop'].forEach(evt => dropzone.addEventListener(evt, e => {
+    e.preventDefault();
+    dropzone.style.background = '';
+  }));
+  dropzone.addEventListener('drop', e => {
+    if (e.dataTransfer.files.length > 0) {
+      fileInput.files = e.dataTransfer.files;
+      fileInput.dispatchEvent(new Event('change'));
+    }
+  });
+</script>
+
+</body>
+</html>

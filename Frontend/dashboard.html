@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Summary — CareRoute AI</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="dashboard.html" class="logo">💙 CareRoute AI</a>
+  <div class="topbar-right">
+    <div class="icon-btn">🔔</div>
+    <div class="avatar">EM</div>
+  </div>
+</header>
+
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="dashboard.html" class="active">🏠 Home</a>
+    <a href="upload.html">📤 Upload</a>
+    <a href="history.html">🕘 History</a>
+    <a href="my-questions.html">❓ My Questions</a>
+    <a href="resources.html">📚 Resources</a>
+    <div class="sidebar-divider"></div>
+    <a href="profile.html">👤 Profile</a>
+    <a href="settings.html">⚙️ Settings</a>
+    <a href="index.html" class="logout">↩ Log Out</a>
+  </aside>
+
+  <main class="main-content">
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+      <div>
+        <h1 class="page-title">Patient Summary</h1>
+        <p class="muted small">Document: Discharge_Summary.pdf &nbsp;•&nbsp; Date: May 20, 2026</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary btn-sm">⬇ Download Summary (PDF)</button>
+        <button class="btn btn-secondary btn-sm">✉ Email to Myself</button>
+      </div>
+    </div>
+
+    <div class="grid-2">
+
+      <!-- Left column -->
+      <div class="stack">
+
+        <div class="card">
+          <h3 style="margin-bottom:12px;">📝 What This Means</h3>
+          <p class="muted">
+            You were treated for an asthma exacerbation (asthma flare-up). You received
+            medication and are now stable. It's important to follow the steps below to
+            keep recovering and prevent future flare-ups.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:14px;">✅ Do Today</h3>
+          <ul class="plain">
+            <li>Take Prednisone 2 tablets once daily with food</li>
+            <li>Use Albuterol inhaler 2 puffs every 4–6 hours as needed</li>
+            <li>Drink plenty of fluids</li>
+            <li>Schedule a follow-up appointment within 3–5 days</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:14px;">🕐 Can Wait</h3>
+          <ul class="plain">
+            <li>Discuss long-term control plan</li>
+            <li>Review inhaler technique</li>
+            <li>Routine lung function test</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-color:#f3c9c9;">
+          <h3 style="margin-bottom:14px; color:var(--red);">🚨 Emergency (Go to ER If...)</h3>
+          <ul class="plain">
+            <li>Trouble breathing that doesn't improve</li>
+            <li>Lips or face turning blue</li>
+            <li>Severe wheezing or tightness</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:14px;">💬 Ask a Question</h3>
+          <p class="muted small" style="margin-bottom:10px;">Your question will be sent to the most relevant specialists.</p>
+          <!-- Wire this to a future "ask a question" / route-question endpoint -->
+          <form action="my-questions.html" method="GET">
+            <div class="form-group">
+              <textarea name="question" placeholder="Type your question here..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Route Question</button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Right column -->
+      <div class="stack">
+
+        <div class="card">
+          <h3 style="margin-bottom:14px;">🩺 Suggested Follow-Up</h3>
+          <p class="muted small" style="margin-bottom:14px;">We found these specialists based on your document.</p>
+
+          <div class="list-row">
+            <div>
+              <div class="title">Pulmonologist</div>
+              <div class="meta">Respiratory Specialist</div>
+            </div>
+            <span class="badge badge-success">94% Match</span>
+          </div>
+          <div class="list-row">
+            <div>
+              <div class="title">Allergist / Immunologist</div>
+              <div class="meta">Asthma triggers</div>
+            </div>
+            <span class="badge badge-medium">78% Match</span>
+          </div>
+          <div class="list-row">
+            <div>
+              <div class="title">Primary Care Physician</div>
+              <div class="meta">General follow-up</div>
+            </div>
+            <span class="badge badge-low">72% Match</span>
+          </div>
+
+          <button class="btn btn-secondary btn-block" style="margin-top:14px;">View All Specialists</button>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:10px;">❓ Questions to Ask Your Doctor</h3>
+          <ul class="plain">
+            <li>Do I need to adjust any of my daily medications?</li>
+            <li>What can I do to prevent future asthma attacks?</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

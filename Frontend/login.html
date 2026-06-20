@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — CareRoute AI</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">💙 CareRoute AI</a>
+  <nav class="public-nav">
+    <a href="index.html">Home</a>
+    <a href="signup-user.html">Sign Up</a>
+  </nav>
+</header>
+
+<div class="auth-wrap">
+  <div class="card">
+
+    <div class="role-toggle">
+      <a href="#" class="active" id="patientTab" onclick="showRole('patient'); return false;">I'm a Patient</a>
+      <a href="#" id="doctorTab" onclick="showRole('doctor'); return false;">I'm a Doctor</a>
+    </div>
+
+    <h1 class="page-title">Welcome back</h1>
+    <p class="page-subtitle">Log in to view your dashboard.</p>
+
+    <!-- Patient login -> GET /verifyUser?username=&password= -->
+    <form id="patientLoginForm" action="#" method="GET">
+      <div class="form-group">
+        <label for="pUsername">Username</label>
+        <input type="text" id="pUsername" name="username" placeholder="Your username" required>
+      </div>
+      <div class="form-group">
+        <label for="pPassword">Password</label>
+        <input type="password" id="pPassword" name="password" placeholder="Your password" required>
+        <div class="error-text">Incorrect username or password.</div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Log In</button>
+    </form>
+
+    <!-- Doctor login -> GET /verifyDoctor?name=&password= -->
+    <form id="doctorLoginForm" action="#" method="GET" style="display:none;">
+      <div class="form-group">
+        <label for="dName">Full name</label>
+        <input type="text" id="dName" name="name" placeholder="Dr. Sarah Lee" required>
+      </div>
+      <div class="form-group">
+        <label for="dPassword">Password</label>
+        <input type="password" id="dPassword" name="password" placeholder="Your password" required>
+        <div class="error-text">Incorrect name or password.</div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Log In</button>
+    </form>
+
+    <p class="auth-switch">
+      Don't have an account?
+      <a href="signup-user.html" id="signupLink">Sign up</a>
+    </p>
+  </div>
+</div>
+
+<script>
+  function showRole(role){
+    const patientTab = document.getElementById('patientTab');
+    const doctorTab = document.getElementById('doctorTab');
+    const patientForm = document.getElementById('patientLoginForm');
+    const doctorForm = document.getElementById('doctorLoginForm');
+    const signupLink = document.getElementById('signupLink');
+
+    if(role === 'patient'){
+      patientTab.classList.add('active');
+      doctorTab.classList.remove('active');
+      patientForm.style.display = 'block';
+      doctorForm.style.display = 'none';
+      signupLink.setAttribute('href', 'signup-user.html');
+    } else {
+      doctorTab.classList.add('active');
+      patientTab.classList.remove('active');
+      doctorForm.style.display = 'block';
+      patientForm.style.display = 'none';
+      signupLink.setAttribute('href', 'signup-doctor.html');
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Details — CareRoute AI</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="doctor-dashboard.html" class="logo">💙 CareRoute AI</a>
+  <div class="topbar-right">
+    <div class="icon-btn">🔔</div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div class="avatar">SL</div>
+      <div>
+        <div style="font-size:13.5px; font-weight:600;">Dr. Sarah Lee</div>
+        <div class="small muted">Pulmonologist</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="doctor-dashboard.html">📊 Dashboard</a>
+    <a href="doctor-dashboard.html?filter=queue" class="active badge-link">📥 My Queue <span class="count">4</span></a>
+    <a href="doctor-dashboard.html?filter=answered">✅ Answered</a>
+    <a href="#">🧑‍🤝‍🧑 Patients</a>
+    <a href="resources.html">📚 Resources</a>
+    <div class="sidebar-divider"></div>
+    <a href="profile.html">👤 Profile</a>
+    <a href="settings.html">⚙️ Settings</a>
+    <a href="index.html" class="logout">↩ Log Out</a>
+  </aside>
+
+  <main class="main-content">
+
+    <a href="doctor-dashboard.html" class="small muted" style="text-decoration:none; display:inline-block; margin-bottom:14px;">← Back to Queue</a>
+    <h1 class="page-title">Question Details</h1>
+
+    <div class="grid-2">
+
+      <!-- Left: question + AI context -->
+      <div class="stack">
+
+        <div class="card">
+          <h3 style="margin-bottom:10px;">Patient Question</h3>
+          <p style="font-size:15.5px; line-height:1.6;">
+            "I was discharged from the ER with asthma. I'm not sure when to use my inhaler and what symptoms are serious."
+          </p>
+          <p class="small muted" style="margin-top:12px;">
+            From Document: Discharge_Summary.pdf &nbsp;•&nbsp; Match: 94% &nbsp;•&nbsp; 10 min ago
+          </p>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:10px;">🤖 AI Extracted Context</h3>
+          <p class="muted" style="margin-bottom:16px;">
+            Patient treated for asthma exacerbation. Prescribed Albuterol inhaler and Prednisone.
+            Needs guidance on inhaler use and warning signs.
+          </p>
+
+          <h4 style="margin-bottom:8px; font-size:14px;">Key Information from Document</h4>
+          <ul class="plain">
+            <li><strong>Diagnosis:</strong> Asthma exacerbation</li>
+            <li><strong>Medications:</strong> Albuterol inhaler, Prednisone</li>
+            <li><strong>Follow-up:</strong> Within 3–5 days</li>
+            <li><strong>Warning signs:</strong> Worsening shortness of breath, chest pain, fever, trouble breathing</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Right: answer box -->
+      <div class="stack">
+
+        <div class="card">
+          <h3 style="margin-bottom:14px;">Your Answer</h3>
+
+          <!-- toolbar is visual only — wire up a rich text editor or plain textarea on the backend -->
+          <div style="display:flex; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); margin-bottom:10px; color:var(--text-muted);">
+            <span><strong>B</strong></span><span><em>I</em></span><span><u>U</u></span><span>🔗</span><span>📋</span><span>"</span><span>≡</span>
+          </div>
+
+          <form action="doctor-dashboard.html" method="GET">
+            <div class="form-group">
+              <textarea name="answer" placeholder="Type your answer here..." style="min-height:160px;" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Add Resources (optional)</label>
+              <input type="text" placeholder="Attach file or link">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Submit Answer</button>
+            <button type="button" class="btn btn-secondary btn-block" style="margin-top:10px;" onclick="window.location.href='doctor-dashboard.html'">Skip Question</button>
+          </form>
+        </div>
+
+        <div class="notice notice-info">
+          ℹ️ <div>Your response will be shared with the patient and added to their care plan.</div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

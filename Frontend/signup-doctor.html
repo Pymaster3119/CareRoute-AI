@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Registration — CareRoute AI</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">💙 CareRoute AI</a>
+  <nav class="public-nav">
+    <a href="index.html">Home</a>
+    <a href="login.html">Log In</a>
+  </nav>
+</header>
+
+<div class="auth-wrap" style="max-width:560px;">
+  <div class="card">
+
+    <div class="role-toggle">
+      <a href="signup-user.html">I'm a Patient</a>
+      <a href="signup-doctor.html" class="active">I'm a Doctor</a>
+    </div>
+
+    <h1 class="page-title">Join as a specialist</h1>
+    <p class="page-subtitle">Get matched with patient questions that fit your expertise.</p>
+
+    <!-- Wire this form up to POST /addDoctor (multipart/form-data) -->
+    <!-- fields: name, password, specialty, email, workplace, document(file) = degree -->
+    <form id="doctorSignupForm" action="#" method="POST" enctype="multipart/form-data">
+
+      <div class="form-group">
+        <label for="docName">Full name</label>
+        <input type="text" id="docName" name="name" placeholder="Dr. Sarah Lee" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="docEmail">Email address</label>
+          <input type="email" id="docEmail" name="email" placeholder="you@hospital.org" required>
+        </div>
+        <div class="form-group">
+          <label for="docPassword">Password</label>
+          <input type="password" id="docPassword" name="password" placeholder="At least 8 characters" required minlength="8">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="specialty">Specialty</label>
+          <select id="specialty" name="specialty" required>
+            <option value="" disabled selected>Select a specialty</option>
+            <option>Pulmonology</option>
+            <option>Allergy / Immunology</option>
+            <option>Primary Care</option>
+            <option>Cardiology</option>
+            <option>Orthopedics</option>
+            <option>Neurology</option>
+            <option>Pediatrics</option>
+            <option>Endocrinology</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="workplace">Workplace</label>
+          <input type="text" id="workplace" name="workplace" placeholder="Hospital / Clinic name" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Degree verification</label>
+        <div class="upload-box small" id="degreeDropzone">
+          <div class="upload-icon">🎓</div>
+          <h3>Upload a photo of your medical degree</h3>
+          <p>This is used to verify your credentials. PNG or JPG.</p>
+          <input type="file" id="degree" name="document" accept="image/*" required style="display:none;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('degree').click()">Choose File</button>
+          <div id="degreeFileName"></div>
+        </div>
+        <div class="hint">Reviewed automatically before your account is activated.</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Submit for Verification</button>
+    </form>
+
+    <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
+  </div>
+</div>
+
+<script>
+  const degreeInput = document.getElementById('degree');
+  const degreeFileName = document.getElementById('degreeFileName');
+  degreeInput.addEventListener('change', () => {
+    if (degreeInput.files.length > 0) {
+      degreeFileName.innerHTML = `<div class="file-chip">📄 ${degreeInput.files[0].name} <span class="remove" onclick="event.stopPropagation(); degreeInput.value=''; degreeFileName.innerHTML='';">✕</span></div>`;
+    }
+  });
+</script>
+
+</body>
+</html>
