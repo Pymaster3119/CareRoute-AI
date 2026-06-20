@@ -5,8 +5,10 @@ import DataStorage.datastorage
 import usersignon
 from werkzeug.utils import secure_filename
 import documentparsing
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/addUser', methods=['POST'])
 def add_user():
@@ -15,8 +17,12 @@ def add_user():
     email = request.form['email']
     password = request.form['password']
     location = request.form['location']
+    msg = usersignon.add_user(username, email, password, location)
+    print(msg)
 
-    return jsonify({"message": usersignon.add_user(username, email, password, location)}), 200
+    if "already exists" in msg:
+        return jsonify({"message": msg}), 400
+    return jsonify({"message": msg}), 200
 
 @app.route('/addDoctor', methods=['POST'])
 def add_doctor():

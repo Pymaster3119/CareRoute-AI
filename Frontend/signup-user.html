@@ -27,6 +27,8 @@
     <h1 class="page-title">Create your account</h1>
     <p class="page-subtitle">Upload your medical documents and get plain-language guidance.</p>
 
+    <div id="signupStatus" class="error-text" style="display:none; margin-bottom:16px;"></div>
+
     <!-- Wire this form up to POST /addUser (fields: username, email, password, location) -->
     <form id="userSignupForm" action="#" method="POST">
 
@@ -64,6 +66,59 @@
     <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
   </div>
 </div>
+
+<script>
+  document.getElementById('userSignupForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const signupStatus = document.getElementById('signupStatus');
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    const showStatus = (message) => {
+      signupStatus.textContent = message;
+      signupStatus.style.display = 'block';
+    };
+
+    signupStatus.textContent = '';
+    signupStatus.style.display = 'none';
+
+    if (password !== confirmPassword) {
+      showStatus('Passwords do not match.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/addUser', {
+        method: 'POST',
+        body: new FormData(form),
+      });
+
+      let payload = null;
+      try {
+        payload = await response.json();
+      } catch (parseError) {
+        payload = null;
+      }
+
+      if (response.ok) {
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      if (response.status === 400) {
+        showStatus('User already exists. Maybe you meant to log in instead?');
+        return;
+      }
+
+      showStatus((payload && payload.message) || `Signup failed with status ${response.status}. Please try again.`);
+    } catch (error) {
+      console.error('Signup request failed:', error);
+      showStatus('The backend is reachable only if it allows browser requests from this page. This looks like a CORS/origin block, not a missing server.');
+    }
+  });
+</script>
 
 </body>
 </html>
