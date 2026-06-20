@@ -27,6 +27,8 @@
     <h1 class="page-title">Welcome back</h1>
     <p class="page-subtitle">Log in to view your dashboard.</p>
 
+    <div id="loginStatus" class="error-text" style="display:none; margin-bottom:16px;"></div>
+
     <!-- Patient login -> GET /verifyUser?username=&password= -->
     <form id="patientLoginForm" action="#" method="GET">
       <div class="form-group">
@@ -36,7 +38,7 @@
       <div class="form-group">
         <label for="pPassword">Password</label>
         <input type="password" id="pPassword" name="password" placeholder="Your password" required>
-        <div class="error-text">Incorrect username or password.</div>
+        <div class="error-text" id="patientLoginHint">Incorrect username or password.</div>
       </div>
       <button type="submit" class="btn btn-primary btn-block">Log In</button>
     </form>
@@ -50,7 +52,7 @@
       <div class="form-group">
         <label for="dPassword">Password</label>
         <input type="password" id="dPassword" name="password" placeholder="Your password" required>
-        <div class="error-text">Incorrect name or password.</div>
+        <div class="error-text" id="doctorLoginHint">Incorrect name or password.</div>
       </div>
       <button type="submit" class="btn btn-primary btn-block">Log In</button>
     </form>
@@ -63,6 +65,8 @@
 </div>
 
 <script>
+  const loginStatus = document.getElementById('loginStatus');
+
   function showRole(role){
     const patientTab = document.getElementById('patientTab');
     const doctorTab = document.getElementById('doctorTab');
@@ -84,6 +88,72 @@
       signupLink.setAttribute('href', 'signup-doctor.html');
     }
   }
+
+  function showStatus(message) {
+    loginStatus.textContent = message;
+    loginStatus.style.display = 'block';
+  }
+
+  function clearStatus() {
+    loginStatus.textContent = '';
+    loginStatus.style.display = 'none';
+  }
+
+  function responseIndicatesSuccess(text) {
+    return text.toLowerCase().includes('verified successfully');
+  }
+
+  document.getElementById('patientLoginForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    clearStatus();
+
+    const username = document.getElementById('pUsername').value;
+    const password = document.getElementById('pPassword').value;
+
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/verifyUser?${new URLSearchParams({ username, password })}`, {
+        method: 'GET',
+      });
+
+      const responseText = await response.text();
+
+      if (response.ok && responseIndicatesSuccess(responseText)) {
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      showStatus(responseText || 'Incorrect username or password.');
+    } catch (error) {
+      console.error('Patient login request failed:', error);
+      showStatus('Unable to reach the login service. Check that the backend is running and allows this page origin.');
+    }
+  });
+
+  document.getElementById('doctorLoginForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    clearStatus();
+
+    const name = document.getElementById('dName').value;
+    const password = document.getElementById('dPassword').value;
+
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/verifyDoctor?${new URLSearchParams({ name, password })}`, {
+        method: 'GET',
+      });
+
+      const responseText = await response.text();
+
+      if (response.ok && responseIndicatesSuccess(responseText)) {
+        window.location.href = 'doctor-dashboard.html';
+        return;
+      }
+
+      showStatus(responseText || 'Incorrect name or password.');
+    } catch (error) {
+      console.error('Doctor login request failed:', error);
+      showStatus('Unable to reach the login service. Check that the backend is running and allows this page origin.');
+    }
+  });
 </script>
 
 </body>

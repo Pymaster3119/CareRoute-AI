@@ -43,12 +43,14 @@ def add_doctor():
     degree_path = secure_filename(degree.filename)
     degree_path = os.path.join(os.path.join(os.path.dirname(__file__), 'temp'), degree_path)
     degree.save(degree_path)
-
-    result = jsonify({"message": usersignon.add_doctor(name, password, specialty, email, workplace, degree_path)}), 200
+    msg = usersignon.add_doctor(name, password, specialty, email, workplace, degree_path)
+    result = jsonify({"message": msg})
 
     #Delete temp file & return
     os.remove(degree_path)
-    return result
+    if "already exists" in msg:
+        return result, 400
+    return result, 200
 
 @app.route('/verifyUser')
 def verify_user():

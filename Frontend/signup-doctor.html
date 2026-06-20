@@ -27,6 +27,8 @@
     <h1 class="page-title">Join as a specialist</h1>
     <p class="page-subtitle">Get matched with patient questions that fit your expertise.</p>
 
+    <div id="doctorSignupStatus" class="error-text" style="display:none; margin-bottom:16px;"></div>
+
     <!-- Wire this form up to POST /addDoctor (multipart/form-data) -->
     <!-- fields: name, password, specialty, email, workplace, document(file) = degree -->
     <form id="doctorSignupForm" action="#" method="POST" enctype="multipart/form-data">
@@ -76,13 +78,13 @@
           <h3>Upload a photo of your medical degree</h3>
           <p>This is used to verify your credentials. PNG or JPG.</p>
           <input type="file" id="degree" name="document" accept="image/*" required style="display:none;">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('degree').click()">Choose File</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="degreeChooseButton">Choose File</button>
           <div id="degreeFileName"></div>
         </div>
         <div class="hint">Reviewed automatically before your account is activated.</div>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-block">Submit for Verification</button>
+      <button type="submit" id="submitButton" class="btn btn-primary btn-block">Submit for Verification</button>
     </form>
 
     <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
@@ -92,9 +94,61 @@
 <script>
   const degreeInput = document.getElementById('degree');
   const degreeFileName = document.getElementById('degreeFileName');
+  const degreeChooseButton = document.getElementById('degreeChooseButton');
+  const doctorSignupForm = document.getElementById('doctorSignupForm');
+  const doctorSignupStatus = document.getElementById('doctorSignupStatus');
+
+  const showStatus = (message) => {
+    doctorSignupStatus.textContent = message;
+    doctorSignupStatus.style.display = 'block';
+  };
+
+  degreeChooseButton.addEventListener('click', () => {
+    degreeInput.click();
+  });
+
+  doctorSignupForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    doctorSignupStatus.textContent = '';
+    doctorSignupStatus.style.display = 'none';
+
+    document.getElementById('submitButton').disabled = true;
+    document.getElementById('submitButton').textContent = 'Verifying Information...';
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/addDoctor', {
+        method: 'POST',
+        body: new FormData(doctorSignupForm),
+      });
+
+      let payload = null;
+      try {
+        payload = await response.json();
+      } catch (parseError) {
+        payload = null;
+      }
+
+      if (response.ok) {
+        window.location.href = 'doctor-dashboard.html';
+        return;
+      }
+
+      showStatus((payload && payload.message) || `Signup failed with status ${response.status}. Please try again.`);
+    } catch (error) {
+      console.error('Doctor signup request failed:', error);
+      showStatus('The signup request could not reach the backend. Check that the API is running and allows this page origin.');
+    }
+  });
+
   degreeInput.addEventListener('change', () => {
     if (degreeInput.files.length > 0) {
-      degreeFileName.innerHTML = `<div class="file-chip">📄 ${degreeInput.files[0].name} <span class="remove" onclick="event.stopPropagation(); degreeInput.value=''; degreeFileName.innerHTML='';">✕</span></div>`;
+      degreeFileName.innerHTML = `<div class="file-chip">📄 ${degreeInput.files[0].name} <span class="remove" id="degreeRemoveButton">✕</span></div>`;
+      document.getElementById('degreeRemoveButton').addEventListener('click', (event) => {
+        event.stopPropagation();
+        degreeInput.value = '';
+        degreeFileName.innerHTML = '';
+      });
     }
   });
 </script>
