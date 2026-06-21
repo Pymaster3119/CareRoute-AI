@@ -44,16 +44,17 @@
 
     <div class="card">
 
-      <!-- Wire this up to POST /uploadDocument (multipart/form-data)
-           fields: username, password, caption, document(file) -->
-      <form id="uploadForm" action="processing.html" method="GET" enctype="multipart/form-data">
+      <!-- POST multipart/form-data to the Flask backend at /uploadDocument -->
+      <form id="uploadForm" action="http://127.0.0.1:5000/uploadDocument" method="POST" enctype="multipart/form-data">
+        <input type="hidden" id="uploadUsername" name="username">
+        <input type="hidden" id="uploadPassword" name="password">
 
         <div class="upload-box" id="dropzone">
           <div class="upload-icon">☁️</div>
           <h3>Drag &amp; drop your file here</h3>
           <p>or</p>
-          <input type="file" id="document" name="document" accept=".pdf,.png,.jpg,.jpeg" required style="display:none;">
-          <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('document').click()">Browse Files</button>
+          <input type="file" id="documentInput" name="document" accept=".pdf,.png,.jpg,.jpeg" required style="display:none;">
+          <button type="button" class="btn btn-primary btn-sm" id="browseFilesButton">Browse Files</button>
           <div id="fileName"></div>
         </div>
         <p class="hint" style="text-align:center; margin-top:10px;">Accepted formats: PDF, PNG, JPG (Max size: 25MB)</p>
@@ -68,56 +69,132 @@
           ⚠️ <div>Please do not upload extremely sensitive documents with personal identifiers. Your privacy and security are our priority.</div>
         </div>
 
-        <div style="text-align:center; margin:20px 0 8px;">— OR —</div>
-
-        <div class="card" style="background:var(--bg); box-shadow:none; text-align:center;">
-          <p style="margin-bottom:12px;">Try with an example. Use our sample discharge summary to see how it works.</p>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="window.location.href='processing.html?demo=1'">Use Example Document</button>
-        </div>
+        <div id="uploadStatus" class="error-text" style="display:none; margin-top:16px;"></div>
 
         <button type="submit" class="btn btn-primary btn-block" style="margin-top:24px;">Continue</button>
       </form>
+
+      <iframe id="uploadTransportFrame" name="uploadTransportFrame" title="Upload transport" aria-hidden="true" tabindex="-1" style="display:none;"></iframe>
     </div>
   </main>
 </div>
 
 <script src="auth-state.js"></script>
-<script>
-  function updateSignedInUser() {
-    const username = CareRouteAuth.getSignedInUsername();
-    const avatar = document.getElementById('signedInAvatar');
-    if (!username || !avatar) {
-      return;
-    }
 
-    avatar.textContent = username;
-    avatar.title = username;
+<script>
+  const uploadForm = document.getElementById('uploadForm');
+  const uploadStatus = document.getElementById('uploadStatus');
+  const submitButton = uploadForm.querySelector('button[type="submit"]');
+
+  const fileInput = document.getElementById('documentInput');
+  const fileName = document.getElementById('fileName');
+  const browseFilesButton = document.getElementById('browseFilesButton');
+
+  const dropzone = document.getElementById('dropzone');
+
+  const uploadUsername = document.getElementById('uploadUsername');
+  const uploadPassword = document.getElementById('uploadPassword');
+
+  function updateSignedInUser() {
+    const authState = CareRouteAuth.getAuthState();
+
+    if (uploadUsername) uploadUsername.value = authState.username || '';
+    if (uploadPassword) uploadPassword.value = authState.password || '';
+
+    const avatar = document.getElementById('signedInAvatar');
+    if (avatar && authState.username) {
+      avatar.textContent = authState.username;
+      avatar.title = authState.username;
+    }
   }
 
   updateSignedInUser();
 
-  const fileInput = document.getElementById('document');
-  const fileName = document.getElementById('fileName');
+  // ---------------- FILE PICKER ----------------
+  browseFilesButton.addEventListener('click', () => {
+    fileInput.click();
+  });
+
   fileInput.addEventListener('change', () => {
     if (fileInput.files.length > 0) {
-      fileName.innerHTML = `<div class="file-chip">📄 ${fileInput.files[0].name} <span class="remove" onclick="event.stopPropagation(); fileInput.value=''; fileName.innerHTML='';">✕</span></div>`;
+      fileName.innerHTML = `
+        <div class="file-chip">
+          📄 ${fileInput.files[0].name}
+          <span class="remove"
+            onclick="event.stopPropagation(); fileInput.value=''; fileName.innerHTML='';">✕</span>
+        </div>`;
     }
   });
 
-  // basic drag & drop visual support
-  const dropzone = document.getElementById('dropzone');
-  ['dragenter','dragover'].forEach(evt => dropzone.addEventListener(evt, e => {
-    e.preventDefault();
-    dropzone.style.background = '#dde9ff';
-  }));
-  ['dragleave','drop'].forEach(evt => dropzone.addEventListener(evt, e => {
-    e.preventDefault();
-    dropzone.style.background = '';
-  }));
+  // ---------------- DRAG & DROP ----------------
+  ['dragenter', 'dragover'].forEach(evt =>
+    dropzone.addEventListener(evt, e => {
+      e.preventDefault();
+      dropzone.style.background = '#dde9ff';
+    })
+  );
+
+  ['dragleave', 'drop'].forEach(evt =>
+    dropzone.addEventListener(evt, e => {
+      e.preventDefault();
+      dropzone.style.background = '';
+    })
+  );
+
   dropzone.addEventListener('drop', e => {
     if (e.dataTransfer.files.length > 0) {
       fileInput.files = e.dataTransfer.files;
       fileInput.dispatchEvent(new Event('change'));
+    }
+  });
+
+  // ---------------- SUBMIT (FIXED) ----------------
+  uploadForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const authState = CareRouteAuth.getAuthState();
+
+    if (!authState.username || !authState.password) {
+      uploadStatus.textContent = 'Please log in again before uploading a document.';
+      uploadStatus.style.display = 'block';
+      return;
+    }
+
+    if (!fileInput.files.length) {
+      uploadStatus.textContent = 'Please choose a document to upload.';
+      uploadStatus.style.display = 'block';
+      return;
+    }
+
+    uploadStatus.style.display = 'none';
+    submitButton.disabled = true;
+
+    // 🔥 Build FormData manually (THIS is what fixes your issue)
+    const formData = new FormData();
+    formData.append('username', authState.username);
+    formData.append('password', authState.password);
+    formData.append('caption', document.getElementById('caption').value || '');
+    formData.append('document', fileInput.files[0]);
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/uploadDocument', {
+        method: 'POST',
+        body: formData
+      });
+
+      // Only confirm server received request (NOT waiting for processing)
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Upload failed');
+      }
+
+      // 🚀 Safe redirect AFTER upload is successfully sent
+      window.location.href = 'processing.html';
+
+    } catch (err) {
+      uploadStatus.textContent = err.message;
+      uploadStatus.style.display = 'block';
+      submitButton.disabled = false;
     }
   });
 </script>

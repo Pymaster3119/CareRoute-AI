@@ -2,7 +2,7 @@ import os
 import sqlite3
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'user_data.db')
 
-number_of_doctors=10
+number_of_doctors=3
 def get_connection():
     return sqlite3.connect(DATABASE_PATH)
 
@@ -86,6 +86,24 @@ def get_doctor_by_id(doctor_id):
         cursor = conn.execute("SELECT * FROM doctors WHERE id = ?", (doctor_id,))
         return cursor.fetchone()
 
+def get_user_by_username(username):
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT * FROM users WHERE username = ?", (username,))
+        return cursor.fetchone()
+
+#endregion
+#region get doctor summaries & answer
+
+def get_all_documents_for_doctor(doctor_id):
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT * FROM documents WHERE matched_doctor_1 = ? OR matched_doctor_2 = ? OR matched_doctor_3 = ? OR matched_doctor_4 = ? OR matched_doctor_5 = ? OR matched_doctor_6 = ? OR matched_doctor_7 = ? OR matched_doctor_8 = ? OR matched_doctor_9 = ? OR matched_doctor_10 = ?", (doctor_id, doctor_id, doctor_id, doctor_id, doctor_id, doctor_id, doctor_id, doctor_id, doctor_id, doctor_id))
+        return cursor.fetchall()
+    
+def get_doctor_by_name(name):
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT * FROM doctors WHERE name = ?", (name,))
+        return cursor.fetchone()
+
 #endregion
 #region add documents
 
@@ -98,8 +116,12 @@ def add_document(document_path, summary, matched_doctors, user_id):
         for i in range(number_of_doctors):
             columns += f", matched_doctor_{i+1}, similarity_score_{i+1}"
             placeholders += ", ?, ?"
+            print(matched_doctors)
             if i < len(matched_doctors):
-                values.extend([matched_doctors[i][0], matched_doctors[i][1]])
+                doctor = matched_doctors[i][0]
+                score = matched_doctors[i][1]
+
+                values.extend([doctor[0], score])  # doctor[0] = doctor_id
             else:
                 values.extend(['', 0])
 

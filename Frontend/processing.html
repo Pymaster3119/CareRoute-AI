@@ -45,15 +45,15 @@
       <div style="text-align:center; font-size:60px; margin-bottom:10px;">📄 → 🤖 → ✅</div>
 
       <div id="checklist">
-        <div class="checklist-item done"><span class="icon">✓</span><span class="label">Reading document</span></div>
-        <div class="checklist-item done"><span class="icon">✓</span><span class="label">Extracting key information</span></div>
-        <div class="checklist-item active"><span class="icon"></span><span class="label">Identifying important actions</span></div>
-        <div class="checklist-item"><span class="icon"></span><span class="label">Finding relevant specialists</span></div>
-        <div class="checklist-item"><span class="icon"></span><span class="label">Preparing your summary</span></div>
+        <div class="checklist-item active"><span class="icon">✓</span><span class="label">Reading document</span></div>
+        <div class="checklist-item"><span class="icon">✓</span><span class="label">Extracting key information</span></div>
+        <div class="checklist-item"><span class="icon">✓</span><span class="label">Comparing to doctors</span></div>
+        <div class="checklist-item"><span class="icon">✓</span><span class="label">Curating recommendations</span></div>
+        <div class="checklist-item"><span class="icon">✓</span><span class="label">Sending question to specialists</span></div>
       </div>
 
-      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:65%;"></div></div>
-      <p class="small muted" id="progressLabel" style="text-align:right;">65%</p>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
+      <p class="small muted" id="progressLabel" style="text-align:right;">0%</p>
     </div>
   </main>
 </div>
@@ -64,7 +64,7 @@
   const items = document.querySelectorAll('.checklist-item');
   const fill = document.getElementById('progressFill');
   const label = document.getElementById('progressLabel');
-  let step = 2; // first two already marked done above
+  let step = 0; // first two already marked done above
 
   const interval = setInterval(() => {
     if (step < items.length) {
@@ -79,7 +79,7 @@
       clearInterval(interval);
       window.location.href = 'dashboard.html';
     }
-  }, 900);
+  }, 4000);
 </script>
 
 </body>

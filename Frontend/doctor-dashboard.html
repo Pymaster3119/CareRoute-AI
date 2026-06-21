@@ -13,7 +13,7 @@
   <div class="topbar-right">
     <div class="icon-btn">🔔</div>
     <div style="display:flex; align-items:center; gap:8px;">
-      <div class="avatar">SL</div>
+      <div class="avatar" id="signedInAvatar">SL</div>
       <div>
         <div style="font-size:13.5px; font-weight:600;">Dr. Sarah Lee</div>
         <div class="small muted">Pulmonologist</div>
@@ -27,7 +27,7 @@
   <!-- Doctor sidebar -->
   <aside class="sidebar">
     <a href="doctor-dashboard.html" class="active">📊 Dashboard</a>
-    <a href="doctor-dashboard.html?filter=queue" class="badge-link">📥 My Queue <span class="count">4</span></a>
+    <a href="doctor-dashboard.html?filter=queue" class="badge-link">📥 My Queue <span class="count" id="doctorQueueCount">4</span></a>
     <a href="doctor-dashboard.html?filter=answered">✅ Answered</a>
     <a href="#">🧑‍🤝‍🧑 Patients</a>
     <a href="resources.html">📚 Resources</a>
@@ -48,68 +48,229 @@
     </div>
     <p class="page-subtitle">Questions routed to you based on your expertise.</p>
 
-    <div class="card" style="padding:0; overflow:hidden;">
-
-      <a href="question-detail.html?id=1" style="text-decoration:none; color:inherit;">
-        <div class="list-row" style="padding:20px 24px;">
-          <div style="flex:1;">
-            <div class="title">"I was discharged from the ER with asthma. I'm not sure when to use my inhaler and what symptoms are serious."</div>
-            <div class="meta">From Document: Discharge_Summary.pdf &nbsp;•&nbsp; 10 min ago &nbsp;•&nbsp; Match: 94% &nbsp;•&nbsp; Asthma &middot; Discharge Summary</div>
-          </div>
-          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-            <span class="badge badge-high">High Priority</span>
-            <span class="btn btn-primary btn-sm">View &amp; Answer</span>
-          </div>
+    <div class="card" style="padding:0; overflow:hidden;" id="doctorDocumentsCard">
+      <div class="list-row" style="padding:20px 24px; border-bottom:none;">
+        <div style="flex:1;">
+          <div class="title">Loading your routed documents...</div>
+          <div class="meta">Fetching captions from the backend.</div>
         </div>
-      </a>
-
-      <a href="question-detail.html?id=2" style="text-decoration:none; color:inherit;">
-        <div class="list-row" style="padding:20px 24px;">
-          <div style="flex:1;">
-            <div class="title">"My child keeps having breathing problems and wheezing at night. The hospital said it might be asthma."</div>
-            <div class="meta">25 min ago &nbsp;•&nbsp; Match: 89% &nbsp;•&nbsp; Pediatric &middot; Asthma</div>
-          </div>
-          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-            <span class="badge badge-high">High Priority</span>
-            <span class="btn btn-primary btn-sm">View &amp; Answer</span>
-          </div>
-        </div>
-      </a>
-
-      <a href="question-detail.html?id=3" style="text-decoration:none; color:inherit;">
-        <div class="list-row" style="padding:20px 24px;">
-          <div style="flex:1;">
-            <div class="title">"Follow-up after asthma attack. Are there long-term treatments I should consider?"</div>
-            <div class="meta">1 hr ago &nbsp;•&nbsp; Match: 82% &nbsp;•&nbsp; Asthma &middot; Follow-up Care</div>
-          </div>
-          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-            <span class="badge badge-medium">Medium Priority</span>
-            <span class="btn btn-primary btn-sm">View &amp; Answer</span>
-          </div>
-        </div>
-      </a>
-
-      <a href="question-detail.html?id=4" style="text-decoration:none; color:inherit;">
-        <div class="list-row" style="padding:20px 24px;">
-          <div style="flex:1;">
-            <div class="title">"I have shortness of breath when exercising, is this related to my asthma?"</div>
-            <div class="meta">2 hr ago &nbsp;•&nbsp; Match: 75% &nbsp;•&nbsp; Asthma &middot; Exercise</div>
-          </div>
-          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-            <span class="badge badge-medium">Medium Priority</span>
-            <span class="btn btn-primary btn-sm">View &amp; Answer</span>
-          </div>
-        </div>
-      </a>
-
+      </div>
     </div>
 
+    <div class="notice notice-danger" id="doctorDocumentsError" style="margin-top:18px; display:none;"></div>
     <div class="notice notice-info" style="margin-top:18px;">
       🔒 <div>Questions are routed based on AI matching and your selected expertise. You are always in control of which questions you choose to answer.</div>
     </div>
 
   </main>
 </div>
+
+<script src="auth-state.js"></script>
+<script>
+  const API_BASE = 'http://127.0.0.1:5000';
+
+  function getDoctorInitials(name) {
+    return String(name || '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase() || 'DR';
+  }
+
+  function truncateWords(text, maxWords) {
+    const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+    if (words.length <= maxWords) {
+      return words.join(' ');
+    }
+    return `${words.slice(0, maxWords).join(' ')}…`;
+  }
+
+  function formatCaption(documentData) {
+    const captionSource = documentData.summary;
+    return truncateWords(captionSource, 20);
+  }
+
+  function getDocumentName(documentPath) {
+    const pathValue = String(documentPath || '').trim();
+    if (!pathValue) {
+      return 'Unknown file';
+    }
+
+    const parts = pathValue.split(/[\\/]/).filter(Boolean);
+    return parts[parts.length - 1] || pathValue;
+  }
+
+  function getCurrentDoctorMatch(documentData, doctorName) {
+    const normalizedDoctorName = String(doctorName || '').trim().toLowerCase();
+    let bestScore = null;
+
+    for (let index = 1; index <= 20; index += 1) {
+      const matchedDoctor = String(documentData[`matched_doctor_${index}`] || '').trim().toLowerCase();
+      const similarityScore = documentData[`similarity_score_${index}`];
+
+      if (similarityScore !== undefined && similarityScore !== null) {
+        const numericScore = Number(similarityScore);
+        if (!Number.isNaN(numericScore)) {
+          bestScore = bestScore === null ? numericScore : Math.max(bestScore, numericScore);
+        }
+      }
+
+      if (matchedDoctor && normalizedDoctorName && matchedDoctor === normalizedDoctorName && similarityScore !== undefined && similarityScore !== null) {
+        const currentScore = Number(similarityScore);
+        return Number.isNaN(currentScore) ? null : currentScore;
+      }
+    }
+
+    return bestScore;
+  }
+
+  function getPriorityBadge(score) {
+    if (score === null || score === undefined || Number.isNaN(Number(score))) {
+      return { className: 'badge-neutral', label: 'Unscored' };
+    }
+
+    if (score >= 90) {
+      return { className: 'badge-high', label: 'High Priority' };
+    }
+
+    if (score >= 80) {
+      return { className: 'badge-medium', label: 'Medium Priority' };
+    }
+
+    return { className: 'badge-low', label: 'Low Priority' };
+  }
+
+  function updateSignedInUser() {
+    const authState = CareRouteAuth.getAuthState();
+    const avatar = document.getElementById('signedInAvatar');
+
+    if (avatar) {
+      avatar.textContent = getDoctorInitials(authState.username || 'Dr');
+      avatar.title = authState.username || 'Doctor';
+    }
+
+    return authState;
+  }
+
+  function showError(message) {
+    const errorBox = document.getElementById('doctorDocumentsError');
+    if (!errorBox) {
+      return;
+    }
+
+    errorBox.innerHTML = '⚠️ <div></div>';
+    errorBox.querySelector('div').textContent = message;
+    errorBox.style.display = 'flex';
+  }
+
+  function renderDocuments(documents, doctorName) {
+    const card = document.getElementById('doctorDocumentsCard');
+    const queueCount = document.getElementById('doctorQueueCount');
+
+    if (!card) {
+      return;
+    }
+
+    if (queueCount) {
+      queueCount.textContent = String(documents.length);
+    }
+
+    if (!documents.length) {
+      card.innerHTML = '<div class="list-row" style="padding:20px 24px; border-bottom:none;"><div style="flex:1;"><div class="title">No routed documents yet</div><div class="meta">Once documents match your specialty, they will appear here.</div></div></div>';
+      return;
+    }
+
+    card.innerHTML = '';
+
+    documents.forEach((documentData) => {
+      console.log(documentData);
+      const documentId = documentData.id;
+      const caption = formatCaption(documentData);
+      const fileName = getDocumentName(documentData.document_path);
+      const score = getCurrentDoctorMatch(documentData, doctorName);
+      const badge = getPriorityBadge(score);
+
+      const rowLink = document.createElement('a');
+      rowLink.href = `question-detail.html?id=${encodeURIComponent(documentId)}`;
+      rowLink.style.textDecoration = 'none';
+      rowLink.style.color = 'inherit';
+
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      row.style.padding = '20px 24px';
+
+      const content = document.createElement('div');
+      content.style.flex = '1';
+
+      const title = document.createElement('div');
+      title.className = 'title';
+      console.log(caption);
+      title.textContent = caption;
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = `Match: ${Math.round(Number(score)*100)}%`;
+
+      content.appendChild(title);
+      content.appendChild(meta);
+
+      const actions = document.createElement('div');
+      actions.style.display = 'flex';
+      actions.style.flexDirection = 'column';
+      actions.style.alignItems = 'flex-end';
+      actions.style.gap = '8px';
+
+      const badgeElement = document.createElement('span');
+      badgeElement.className = `badge ${badge.className}`;
+      badgeElement.textContent = badge.label;
+
+      const actionButton = document.createElement('span');
+      actionButton.className = 'btn btn-primary btn-sm';
+      actionButton.textContent = 'View & Answer';
+
+      actions.appendChild(badgeElement);
+      actions.appendChild(actionButton);
+
+      row.appendChild(content);
+      row.appendChild(actions);
+      rowLink.appendChild(row);
+      card.appendChild(rowLink);
+    });
+  }
+
+  async function loadDoctorDocuments() {
+    const authState = updateSignedInUser();
+    const doctorName = authState.username;
+    const password = authState.password;
+
+    if (!doctorName || !password) {
+      showError('Please sign in again so we can load your routed documents.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/getDoctorDocuments?${new URLSearchParams({ name: doctorName, password })}`, {
+        method: 'GET',
+        cache: 'no-store',
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.message || 'Unable to load routed documents.');
+      }
+
+      renderDocuments(Array.isArray(payload) ? payload : [], doctorName);
+    } catch (error) {
+      showError(error.message || 'Unable to load routed documents right now.');
+      renderDocuments([], doctorName);
+    }
+  }
+
+  loadDoctorDocuments();
+</script>
 
 </body>
 </html>
