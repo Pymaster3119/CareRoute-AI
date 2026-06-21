@@ -5,6 +5,65 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>History — CareRoute AI</title>
 <link rel="stylesheet" href="styles.css">
+
+<style>
+/* ===== FULLSCREEN MODAL ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999;
+}
+
+/* ===== SPLIT LAYOUT ===== */
+.split-container {
+  width: 95vw;
+  height: 92vh;
+  margin: 3vh auto;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  overflow: hidden;
+}
+
+/* LEFT PANEL */
+.left-panel {
+  width: 30%;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+/* RIGHT PANEL */
+.right-panel {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* DOCUMENT VIEW */
+#modalViewer {
+  flex: 1;
+  width: 100%;
+  border: none;
+}
+
+/* CAPTION */
+.caption-box {
+  white-space: pre-wrap;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+</style>
+
 </head>
 <body>
 
@@ -20,13 +79,7 @@
 
   <aside class="sidebar">
     <a href="dashboard.html">🏠 Home</a>
-    <a href="upload.html">📤 Upload</a>
-    <a href="history.html" class="active">🕘 History</a>
-    <a href="my-questions.html">❓ My Questions</a>
-    <a href="resources.html">📚 Resources</a>
-    <div class="sidebar-divider"></div>
-    <a href="profile.html">👤 Profile</a>
-    <a href="settings.html">⚙️ Settings</a>
+    <a href="resources.html" class="active">📚 Resources</a>
     <a href="index.html" class="logout">↩ Log Out</a>
   </aside>
 
@@ -34,72 +87,173 @@
     <h1 class="page-title">Document History</h1>
     <p class="page-subtitle">Every document you've uploaded and its summary.</p>
 
-    <div class="card">
-
-      <div class="list-row">
-        <div>
-          <div class="title">📄 Discharge_Summary.pdf</div>
-          <div class="meta">Uploaded May 20, 2026 &nbsp;•&nbsp; Asthma exacerbation</div>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <span class="badge badge-success">Processed</span>
-          <a href="dashboard.html" class="btn btn-secondary btn-sm">View Summary</a>
-        </div>
-      </div>
-
-      <div class="list-row">
-        <div>
-          <div class="title">📄 Lab_Results_April.jpg</div>
-          <div class="meta">Uploaded April 3, 2026 &nbsp;•&nbsp; Bloodwork panel</div>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <span class="badge badge-success">Processed</span>
-          <a href="dashboard.html" class="btn btn-secondary btn-sm">View Summary</a>
-        </div>
-      </div>
-
-      <div class="list-row">
-        <div>
-          <div class="title">📄 Referral_Letter.pdf</div>
-          <div class="meta">Uploaded March 18, 2026 &nbsp;•&nbsp; Orthopedic referral</div>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <span class="badge badge-success">Processed</span>
-          <a href="dashboard.html" class="btn btn-secondary btn-sm">View Summary</a>
-        </div>
-      </div>
-
+    <div class="card" id="historyContainer">
+      <div class="loading">Loading documents...</div>
     </div>
-
-    <!-- Empty state: shown instead of the list above when a patient has no documents yet -->
-    <!--
-    <div class="card">
-      <div class="empty-state">
-        <div class="icon">📄</div>
-        <h3>No documents yet</h3>
-        <p>Upload your first medical document to get started.</p>
-        <a href="upload.html" class="btn btn-primary" style="margin-top:14px;">Upload Document</a>
-      </div>
-    </div>
-    -->
 
   </main>
 </div>
 
+<!-- FULLSCREEN VIEWER -->
+<div id="docModal" class="modal" style="display:none;">
+  <div class="split-container">
+
+    <!-- LEFT -->
+    <div class="left-panel">
+      <h2>Document Details</h2>
+      <div id="modalCaption" class="caption-box"></div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right-panel">
+
+      <div class="top-bar">
+        <h3>Preview</h3>
+        <button onclick="closeModal()" class="btn btn-secondary btn-sm">
+          Close
+        </button>
+      </div>
+
+      <iframe id="modalViewer"></iframe>
+
+    </div>
+
+  </div>
+</div>
+
 <script src="auth-state.js"></script>
+
 <script>
-  function updateSignedInUser() {
+const API_BASE = "http://127.0.0.1:5000";
+
+/* ===== USER HEADER ===== */
+function updateSignedInUser() {
     const username = CareRouteAuth.getSignedInUsername();
-    const avatar = document.getElementById('signedInAvatar');
-    if (!username || !avatar) {
-      return;
-    }
+    const avatar = document.getElementById("signedInAvatar");
+
+    if (!username || !avatar) return;
 
     avatar.textContent = username;
     avatar.title = username;
-  }
+}
 
-  updateSignedInUser();
+/* ===== OPEN DOCUMENT VIEWER ===== */
+function openDocument(docId, caption) {
+
+    const modal = document.getElementById("docModal");
+    const viewer = document.getElementById("modalViewer");
+    const captionBox = document.getElementById("modalCaption");
+
+    captionBox.innerText = caption || "No caption available";
+
+    viewer.src = `${API_BASE}/get-file/${docId}`;
+
+    modal.style.display = "block";
+}
+
+/* ===== CLOSE MODAL ===== */
+function closeModal() {
+    document.getElementById("docModal").style.display = "none";
+    document.getElementById("modalViewer").src = "";
+}
+
+/* click outside closes */
+window.onclick = function(event) {
+    const modal = document.getElementById("docModal");
+    if (event.target === modal) closeModal();
+};
+
+/* ===== LOAD HISTORY ===== */
+async function loadHistory() {
+
+    const container = document.getElementById("historyContainer");
+
+    const auth = CareRouteAuth.getAuthState();
+    const username = auth.username;
+    const password = auth.password;
+
+    if (!username || !password) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h3>Not signed in</h3>
+                <p>Please log in again.</p>
+            </div>
+        `;
+        return;
+    }
+
+    try {
+
+        const params = new URLSearchParams({ username, password });
+
+        const response = await fetch(
+            `${API_BASE}/getDocumentsForUser?${params}`
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to load documents");
+        }
+
+        const documents = await response.json();
+
+        if (!documents.length) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">📄</div>
+                    <h3>No documents yet</h3>
+                    <p>Upload your first medical document to get started.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = "";
+
+        documents.forEach(doc => {
+
+            const filename = doc.document_path
+                ? doc.document_path.split(/[\\/]/).pop()
+                : `Document ${doc.id}`;
+
+            const summary = doc.summary || "No caption available";
+
+            const row = document.createElement("div");
+            row.className = "list-row";
+
+            row.innerHTML = `
+                <div>
+                    <div class="title">📄 ${filename}</div>
+                    <div class="meta">${summary}</div>
+                </div>
+
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <span class="badge badge-success">Processed</span>
+
+                    <button class="btn btn-secondary btn-sm"
+                        onclick='openDocument(${doc.id}, ${JSON.stringify(summary)})'>
+                        View Full
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(row);
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        container.innerHTML = `
+            <div class="empty-state">
+                <h3>Error loading history</h3>
+                <p>${err.message}</p>
+            </div>
+        `;
+    }
+}
+
+updateSignedInUser();
+loadHistory();
 </script>
 
 </body>

@@ -126,6 +126,25 @@ def add_document(document_path, summary, matched_doctors, user_id):
                 values.extend(['', 0])
 
         conn.execute(f"INSERT INTO documents ({columns}) VALUES ({placeholders})", values)
+
+def get_document_by_id(document_id):
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT * FROM documents WHERE id = ?", (document_id,))
+        return cursor.fetchone()
+
+def add_answer_to_document(document_id, answer):
+    with get_connection() as conn:
+        #Add answer: \n to the document's summary
+        document = get_document_by_id(document_id)
+        if document:
+            new_summary = document[2] + "\nAnswer: " + answer
+            conn.execute("UPDATE documents SET summary = ? WHERE id = ?", (new_summary, document_id))
+
+def get_documents_for_user(user_id):
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT * FROM documents WHERE user_id = ?", (user_id,))
+        return cursor.fetchall()
+
 #endregion
 
 create_user_table()

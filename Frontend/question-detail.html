@@ -6,6 +6,7 @@
 <title>Question Details — CareRoute AI</title>
 <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
 <header class="topbar">
@@ -26,7 +27,9 @@
 
   <aside class="sidebar">
     <a href="doctor-dashboard.html">📊 Dashboard</a>
-    <a href="doctor-dashboard.html?filter=queue" class="active badge-link">📥 My Queue <span class="count">4</span></a>
+    <a href="doctor-dashboard.html?filter=queue" class="active badge-link">
+      📥 My Queue <span class="count">4</span>
+    </a>
     <a href="doctor-dashboard.html?filter=answered">✅ Answered</a>
     <a href="#">🧑‍🤝‍🧑 Patients</a>
     <a href="resources.html">📚 Resources</a>
@@ -38,56 +41,62 @@
 
   <main class="main-content">
 
-    <a href="doctor-dashboard.html" class="small muted" style="text-decoration:none; display:inline-block; margin-bottom:14px;">← Back to Queue</a>
+    <a href="doctor-dashboard.html"
+       class="small muted"
+       style="text-decoration:none; display:inline-block; margin-bottom:14px;">
+      ← Back to Queue
+    </a>
+
     <h1 class="page-title">Question Details</h1>
 
     <div class="grid-2">
 
-      <!-- Left: question + AI context -->
+      <!-- LEFT SIDE -->
       <div class="stack">
 
+        <!-- Patient Question -->
         <div class="card">
           <h3 style="margin-bottom:10px;">Patient Question</h3>
-          <p style="font-size:15.5px; line-height:1.6;">
-            "I was discharged from the ER with asthma. I'm not sure when to use my inhaler and what symptoms are serious."
+          <p style="font-size:15.5px; line-height:1.6;" id="patientQuestion">
+            Loading question...
           </p>
-          <p class="small muted" style="margin-top:12px;">
-            From Document: Discharge_Summary.pdf &nbsp;•&nbsp; Match: 94% &nbsp;•&nbsp; 10 min ago
+
+          <p class="small muted" style="margin-top:12px;" id="metaInfo">
+            Loading metadata...
           </p>
         </div>
 
-        <div class="card">
-          <h3 style="margin-bottom:10px;">🤖 AI Extracted Context</h3>
-          <p class="muted" style="margin-bottom:16px;">
-            Patient treated for asthma exacerbation. Prescribed Albuterol inhaler and Prednisone.
-            Needs guidance on inhaler use and warning signs.
-          </p>
+        <!-- LIVE DOCUMENT VIEWER -->
+        <div class="card" style="height:600px;">
+          <h3 style="margin-bottom:10px;">📄 Document Viewer</h3>
 
-          <h4 style="margin-bottom:8px; font-size:14px;">Key Information from Document</h4>
-          <ul class="plain">
-            <li><strong>Diagnosis:</strong> Asthma exacerbation</li>
-            <li><strong>Medications:</strong> Albuterol inhaler, Prednisone</li>
-            <li><strong>Follow-up:</strong> Within 3–5 days</li>
-            <li><strong>Warning signs:</strong> Worsening shortness of breath, chest pain, fever, trouble breathing</li>
-          </ul>
+          <iframe
+            id="docFrame"
+            style="width:100%; height:550px; border:1px solid var(--border); border-radius:8px;"
+          ></iframe>
         </div>
 
       </div>
 
-      <!-- Right: answer box -->
+      <!-- RIGHT SIDE -->
       <div class="stack">
 
+        <!-- ANSWER BOX -->
         <div class="card">
           <h3 style="margin-bottom:14px;">Your Answer</h3>
 
-          <!-- toolbar is visual only — wire up a rich text editor or plain textarea on the backend -->
-          <div style="display:flex; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); margin-bottom:10px; color:var(--text-muted);">
-            <span><strong>B</strong></span><span><em>I</em></span><span><u>U</u></span><span>🔗</span><span>📋</span><span>"</span><span>≡</span>
-          </div>
+          <form id="answerForm">
 
-          <form action="doctor-dashboard.html" method="GET">
+            <input type="hidden" id="docIdInput" name="doc_id">
+
             <div class="form-group">
-              <textarea name="answer" placeholder="Type your answer here..." style="min-height:160px;" required></textarea>
+              <textarea
+                id="answerInput"
+                name="answer"
+                placeholder="Type your answer here..."
+                style="min-height:160px;"
+                required>
+              </textarea>
             </div>
 
             <div class="form-group">
@@ -95,8 +104,17 @@
               <input type="text" placeholder="Attach file or link">
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Submit Answer</button>
-            <button type="button" class="btn btn-secondary btn-block" style="margin-top:10px;" onclick="window.location.href='doctor-dashboard.html'">Skip Question</button>
+            <button type="submit" class="btn btn-primary btn-block">
+              Submit Answer
+            </button>
+
+            <button type="button"
+                    class="btn btn-secondary btn-block"
+                    style="margin-top:10px;"
+                    onclick="window.location.href='doctor-dashboard.html'">
+              Skip Question
+            </button>
+
           </form>
         </div>
 
@@ -106,9 +124,77 @@
 
       </div>
     </div>
-
   </main>
 </div>
+
+<script>
+  const API_BASE = 'http://127.0.0.1:5000';
+
+  function getQueryParam(name) {
+    return new URL(window.location.href).searchParams.get(name);
+  }
+
+  async function loadQuestionAndDocument() {
+    const docId = getQueryParam("id");
+    if (!docId) return;
+
+    // Load document viewer
+    const iframe = document.getElementById("docFrame");
+    iframe.src = `${API_BASE}/get-file/${docId}`;
+
+    // Load metadata
+    try {
+      const res = await fetch(`${API_BASE}/getDocumentMeta?id=${docId}`);
+      if (res.ok) {
+        const data = await res.json();
+
+        document.getElementById("patientQuestion").textContent =
+          data.question || "No question available";
+
+        document.getElementById("metaInfo").textContent =
+          `From Document: ${data.filename || "Unknown"} • Match: ${Math.round((data.match || 0) * 100)}%`;
+      }
+    } catch (e) {
+      console.log("Metadata endpoint not available yet.");
+    }
+  }
+
+  async function submitAnswer(docId) {
+    const answerText = document.getElementById("answerInput").value;
+
+    const formData = new FormData();
+    formData.append("doc_id", docId);
+    formData.append("answer", answerText);
+
+    const res = await fetch(`${API_BASE}/addAnswer`, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || "Failed to submit answer");
+      return;
+    }
+
+    window.location.href = "doctor-dashboard.html";
+  }
+
+  function initAnswerForm() {
+    const docId = getQueryParam("id");
+
+    document.getElementById("docIdInput").value = docId;
+
+    document.getElementById("answerForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      submitAnswer(docId);
+    });
+  }
+
+  loadQuestionAndDocument();
+  initAnswerForm();
+</script>
 
 </body>
 </html>

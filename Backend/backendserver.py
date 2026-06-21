@@ -187,13 +187,111 @@ def get_doctor_documents():
 
     return jsonify(document_list), 200
 
-@app.route('/get-file')
+@app.route('/get-file/<int:doc_id>', methods=['GET'])
+def get_file(doc_id):
+    doc = DataStorage.datastorage.get_document_by_id(doc_id)
 
-def get_file():
+    if not doc:
+        return jsonify({"message": "Document not found"}), 404
 
-    file_path = "/absolute/path/to/your/file.pdf"
+    file_path = doc[1]  # assuming column 1 is path
 
-    return send_file(file_path, as_attachment=True)
+    if not os.path.exists(file_path):
+        return jsonify({"message": "File missing"}), 404
+
+    return send_file(file_path, as_attachment=False)
+
+@app.route('/getDocumentMeta', methods=['GET'])
+def get_document_meta():
+    doc_id = request.args.get('id')
+
+    if not doc_id:
+        return jsonify({"message": "Missing document id"}), 400
+
+    try:
+        doc_id = int(doc_id)
+    except:
+        return jsonify({"message": "Invalid document id"}), 400
+
+    # Fetch document
+    document = DataStorage.datastorage.get_document_by_id(doc_id)
+
+    if not document:
+        return jsonify({"message": "Document not found"}), 404
+
+    file_path = document[1]
+    summary = document[2]
+    user_id = document[3]
+
+    filename = os.path.basename(file_path)
+
+    best_match = 0.0
+
+    for i in range(DataStorage.datastorage.number_of_doctors):
+        score = document[5 + 2*i] if len(document) > (5 + 2*i) else None
+        if score is not None:
+            try:
+                best_match = max(best_match, float(score))
+            except:
+                pass
+
+    question_text = summary if summary else "No question available"
+
+    return jsonify({
+        "id": doc_id,
+        "filename": filename,
+        "question": question_text,
+        "match": best_match
+    }), 200
+
+@app.route('/addAnswer', methods=['POST'])
+def add_answer():
+    doc_id = request.form.get('doc_id')
+    answer_text = request.form.get('answer')
+
+    if not doc_id or not answer_text:
+        return jsonify({"message": "Missing required fields"}), 400
+
+    try:
+        doc_id = int(doc_id)
+    except:
+        return jsonify({"message": "Invalid document id"}), 400
+
+    DataStorage.datastorage.add_answer_to_document(doc_id, answer_text)
+
+    return jsonify({"message": "Answer added successfully!"}), 200
+
+@app.route('/getDocumentsForUser', methods=['GET'])
+def get_documents_for_user():
+    username = request.args.get('username')
+    password = request.args.get('password')
+    print(username)
+    print(password)
+
+    if not username or not password:
+        return jsonify({"message": "Missing credentials"}), 400
+
+    if not DataStorage.datastorage.verify_user(username, password):
+        return jsonify({"message": "User verification failed"}), 401
+
+    user_id = DataStorage.datastorage.get_user_by_username(username)[0]
+
+    documents = DataStorage.datastorage.get_documents_for_user(user_id)
+
+    document_list = []
+    for document in documents:
+        document_dict = {
+            "id": document[0],
+            "document_path": document[1],
+            "summary": document[2],
+            "user_id": document[3]
+        }
+        for i in range(DataStorage.datastorage.number_of_doctors):
+            document_dict[f'matched_doctor_{i+1}'] = document[4+2*i]
+            document_dict[f'similarity_score_{i+1}'] = document[5+2*i]
+        document_list.append(document_dict)
+
+    return jsonify(document_list), 200
 
 if __name__ == '__main__':
     app.run(debug=False)
